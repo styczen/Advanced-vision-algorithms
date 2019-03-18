@@ -10,7 +10,7 @@ FN = 0
 kernel = np.ones((5, 5), np.uint8)
 
 DIR = os.getcwd() + '/../sequences'
-SEQUENCE = '/highway'
+SEQUENCE = '/office'
 DIR = DIR + SEQUENCE
 
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     roi_start, roi_end = read_roi_values()
     bg_mask = cv2.imread(DIR+'/input/in%06d.jpg' % roi_start, cv2.IMREAD_GRAYSCALE)
 
-    fg_gmm = cv2.createBackgroundSubtractorMOG2(history=500,
+    fg_gmm = cv2.createBackgroundSubtractorMOG2(history=10,
                                                 varThreshold=16,
                                                 detectShadows=False)
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         FP = FP + FP_S
         FN = FN + FN_S
 
-        if cv2.waitKey(1) == 27:
+        if cv2.waitKey(10) == 27:
             break
 
     P = TP / (TP + FP)

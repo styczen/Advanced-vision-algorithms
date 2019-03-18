@@ -15,7 +15,7 @@ NR_MIN = 2
 PHI = 16
 
 DIR = os.getcwd() + '/../sequences'
-SEQUENCE = '/highway'
+SEQUENCE = '/office'
 DIR = DIR + SEQUENCE
 
 TP = 0
