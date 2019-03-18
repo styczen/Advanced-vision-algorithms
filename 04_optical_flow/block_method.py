@@ -16,6 +16,9 @@ if __name__ == '__main__':
 
     diff = cv2.absdiff(img1, img2)
 
+    # img1 = cv2.medianBlur(img1, 3)
+    # img2 = cv2.medianBlur(img2, 3)
+
     cv2.imshow('Frame 1', img1)
     cv2.imshow('Frame 2', img2)
 
@@ -38,24 +41,19 @@ if __name__ == '__main__':
             for jo in range(j-dX, j+dX+1):
                 for io in range(i-dY, i+dY+1):
                     JO = np.float32(img2[jo - W2:jo + W2 + 1, io - W2:io + W2 + 1])
-                    dist = np.sum(np.sqrt((np.square(JO - IO))))
-                    print(jo, io, dist)
+                    dist = np.sqrt(np.sum(np.square(JO - IO)))
+                    # print(jo, io, dist)
                     if dist < min_dist:
                         best_x, best_y = io-i, jo-j
                         min_dist = dist
-            print('Best {} {}, dist {}\n'.format(best_x, best_y, min_dist))
+            # print('Best {} {}, dist {}\n'.format(best_x, best_y, min_dist))
             u[j, i] = best_x
             v[j, i] = best_y
 
-    # print(u)
     plt.figure(1)
     plt.quiver(u, v)
+    plt.gca().invert_yaxis()
     plt.show()
 
-
-
-
-
     cv2.waitKey(0)
-
     cv2.destroyAllWindows()
