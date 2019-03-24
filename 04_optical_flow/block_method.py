@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import time
 
 
 DIR = os.getcwd()
@@ -31,24 +32,25 @@ if __name__ == '__main__':
     u = np.zeros(img1.shape)
     v = np.zeros(img2.shape)
 
-    for j in range(2, img1.shape[0]-2):
-        for i in range(2, img1.shape[1]-2):
+    start = time.process_time()
+    for j in range(W-1, img1.shape[0]-(W-1)):
+        for i in range(W-1, img1.shape[1]-(W-1)):
             IO = np.float32(img1[j - W2:j + W2 + 1, i - W2:i + W2 + 1])
 
             best_x, best_y = -1, -1
             min_dist = 100000.0
-            # print('Current {} {}'.format(j, i))
-            for jo in range(j-dX, j+dX+1):
-                for io in range(i-dY, i+dY+1):
+            for jo in range(j-W2, j+W2+1, dX):
+                for io in range(i-W2, i+W2+1, dY):
                     JO = np.float32(img2[jo - W2:jo + W2 + 1, io - W2:io + W2 + 1])
                     dist = np.sqrt(np.sum(np.square(JO - IO)))
-                    # print(jo, io, dist)
                     if dist < min_dist:
                         best_x, best_y = io-i, jo-j
                         min_dist = dist
-            # print('Best {} {}, dist {}\n'.format(best_x, best_y, min_dist))
-            u[j, i] = best_x
-            v[j, i] = best_y
+            u[j, i] = best_y
+            v[j, i] = best_x
+            
+    stop = time.process_time()
+    print("W = {}, dX = {}, dY = {}, time = {} sec.".format(W, dX, dY, stop-start))
 
     plt.figure(1)
     plt.quiver(u, v)
