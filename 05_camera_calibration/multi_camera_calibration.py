@@ -20,7 +20,7 @@ if __name__ == '__main__':
     imgpoints_l = []  # punkty 2d w plaszczyznie obrazu.
     imgpoints_r = []  # punkty 2d w plaszczyznie obrazu.
 
-    for fname in range(1, 14):
+    for fname in range(1, 13):
         # wczytanie obrazu
         img_l = cv2.imread(DIR + 'images_left/left%02d.jpg' % fname)
         img_r = cv2.imread(DIR + 'images_right/right%02d.jpg' % fname)
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         ret_r, corners_r = cv2.findChessboardCorners(gray_r, (7, 6), None)
 
         # jesli znaleniono na obrazie punkty
-        if ret_l == True and ret_r == True:
+        if ret_l is True and ret_r is True:
             # dolaczenie wspolrzednych 3D
             objpoints.append(objp)
 
@@ -71,21 +71,14 @@ if __name__ == '__main__':
     dst_L = cv2.remap(img_l, map1_L, map2_L, cv2.INTER_LINEAR)
     dst_R = cv2.remap(img_r, map1_R, map2_R, cv2.INTER_LINEAR)
 
-    cv2.imshow('Distort left', img_l)
-    cv2.imshow('Distort right', img_r)
+    N, XX, YY = dst_L.shape[::-1]  # pobranie rozmiarow obrazka (kolorowego)
+    visRectify = np.zeros((YY, XX*2, N), np.uint8)  # utworzenie nowego obrazka oszerokosci x2
+    visRectify[:, 0:640:, :] = dst_L      # przypisanie obrazka lewego
+    visRectify[:, 640:1280:, :] = dst_R   # przypisanie obrazka prawego
 
-    cv2.imshow('Undistort left', dst_L)
-    cv2.imshow('Undistort right', dst_R)
-
-
-    # N, XX, YY = dst_L.shape[::-1]  # pobranie rozmiarow obrazka (kolorowego)
-    # visRectify = np.zeros((YY,XX*2,N),np.uint8) # utworzenie nowego obrazka oszerokosci x2
-    # visRectify[:, 0:640:, :] = dst_L      # przypisanie obrazka lewego
-    # visRectify[:, 640:1280:, :] = dst_R   # przypisanie obrazka prawego
-    #
-    # # Wyrysowanie poziomych linii
-    # for y in range(0, 480, 10):
-    #     cv2.line(visRectify, (0,y), (1280,y), (255,0,0))
-    #     cv2.imshow('visRectify', visRectify)  #wizualizacja
+    # Wyrysowanie poziomych linii
+    for y in range(0, 480, 10):
+        cv2.line(visRectify, (0, y), (1280, y), (255, 0, 0))
+    cv2.imshow('visRectify', visRectify)  # wizualizacja
 
     cv2.waitKey(0)

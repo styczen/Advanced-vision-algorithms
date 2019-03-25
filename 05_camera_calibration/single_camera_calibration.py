@@ -19,7 +19,7 @@ if __name__ == '__main__':
     objpoints = [] # punkty 3d w przestrzeni (rzeczywsite)
     imgpoints = [] # punkty 2d w plaszczyznie obrazu.
 
-    for fname in range(1, 14):
+    for fname in range(1, 13):
         # wczytanie obrazu
         img = cv2.imread(DIR + 'images_left/left%02d.jpg' % fname)
 
@@ -58,6 +58,6 @@ if __name__ == '__main__':
 
     cv2.imshow('Undistort, alpha = {}'.format(alpha), dst)
 
-    cv2.imwrite('calibresult_{}.png'.format(alpha), dst)
+    cv2.imwrite('calibresult.png', dst)
 
     cv2.waitKey(0)
