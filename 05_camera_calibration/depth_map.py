@@ -18,7 +18,7 @@ aloe_r_gray = cv2.cvtColor(aloe_r, cv2.COLOR_BGR2GRAY)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
-stereoBM = cv2.StereoBM_create(numDisparities=0, blockSize=15)
+stereoBM = cv2.StereoBM_create(numDisparities=128, blockSize=15)
 print('Computing disparity map using block matching...')
 disparityBM = stereoBM.compute(aloe_l_gray, aloe_r_gray)
 print('...done')
