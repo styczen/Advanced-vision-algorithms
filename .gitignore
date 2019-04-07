@@ -110,3 +110,5 @@ venv.bak/
 # Ignore all directories except zipped ones
 /sequences/*
 !/sequences/*.zip
+
+/skrypt
