@@ -1,12 +1,14 @@
 import cv2
 import numpy as np
+import sys
 import os
 
-DIR = os.getcwd()
 THRESHOLD = 40
 MIN_AREA = 2000
 
-cap = cv2.VideoCapture(DIR + '/vid1_IR.avi')
+DIR = os.path.dirname(sys.argv[0])
+# DIR = os.path.dirname(os.path.realpath(__file__))
+cap = cv2.VideoCapture(DIR + '/../vid1_IR.avi')
 
 
 def connect_blobs1(stats , centroids):
@@ -34,7 +36,6 @@ def connect_blobs1(stats , centroids):
                 new_bottom = parent_blob_bottom if parent_blob_bottom > bottom else bottom
                 stats[i, :] = np.array([new_left, new_top, new_right-new_left, new_bottom-new_top, parent_blob_area+area])
 
-
     for i in range(stats.shape[0]):
         for j in range(stats.shape[0]):
             if i != j and np.all(stats[i, :4] == stats[j, :4]):
@@ -47,12 +48,12 @@ def connect_blobs1(stats , centroids):
 
 
 roi_mask = np.vstack((np.zeros((100, 480), dtype=np.uint8), np.ones((360-100, 480), dtype=np.uint8)))
+iPedestrian = 26
 
 while cap.isOpened():
     ret, frame = cap.read()
     if ret is True:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        frame_temp = frame.copy()
         # cv2.imshow('IR', gray)
 
         gray = gray * roi_mask
@@ -76,48 +77,32 @@ while cap.isOpened():
             stats_copy = stats.copy()
 
             updated_stats = connect_blobs1(stats_copy, centroids)
-            print('*********************')
-            print('Stats')
-            print(stats)
-            print('---------------------')
-            print('Updated stats')
-            print(updated_stats)
-            print('*********************')
 
             for i in range(updated_stats.shape[0]):
                 if updated_stats[i, 4] > MIN_AREA:
-                    cv2.rectangle(img=frame_temp,
+                    cv2.rectangle(img=frame,
                                   pt1=(updated_stats[i, 0], updated_stats[i, 1]),
                                   pt2=(updated_stats[i, 0] + updated_stats[i, 2], updated_stats[i, 1] + updated_stats[i, 3]),
                                   color=(0, 0, 255),
                                   thickness=2)
 
-            for i in range(stats.shape[0]):
-                # if stats[i, 4] > MIN_AREA:
-                cv2.rectangle(img=frame,
-                              pt1=(stats[i, 0], stats[i, 1]),
-                              pt2=(stats[i, 0] + stats[i, 2], stats[i, 1] + stats[i, 3]),
-                              color=(0, 0, 255),
-                              thickness=2)
-
-                cv2.circle(img=frame,
-                           center=(np.int(centroids[i, 0]), np.int(centroids[i, 1])),
-                           radius=2,
-                           color=(0, 255, 0),
-                           thickness=3)
-
         mask_filtered = cv2.cvtColor(mask_filtered, cv2.COLOR_GRAY2BGR)
 
-        # cv2.imshow('Mask filtered', mask_filtered)
-        # cv2.imshow('Frame', frame)
-        # cv2.imshow('Frame connected', frame_temp)
-
-        combined_imgs = np.hstack([mask_filtered, frame, frame_temp])
+        combined_imgs = np.hstack([mask_filtered, frame])
         cv2.imshow('Combined', combined_imgs)
 
-        if cv2.waitKey(0) & 0xff == ord('q'):
+        key = cv2.waitKey(0)
+        if key & 0xff == ord('q'):
             break
+        elif key & 0xff == ord('s'):
+            for i in range(updated_stats.shape[0]):
+                if updated_stats[i, 4] > MIN_AREA:
+                    ROI = gray[stats[i, 1]:stats[i, 1]+stats[i, 3], stats[i, 0]:stats[i, 0]+stats[i, 2]]
+                    cv2.imwrite(DIR + '/samples/sample_%06d.png' % iPedestrian, ROI)
+                    iPedestrian += 1
+                    print('Samples saved: {}'.format(iPedestrian))
     else:
         break
 
+cv2.destroyAllWindows()
 cap.release()
