@@ -76,13 +76,13 @@ while cap.isOpened():
             stats_copy = stats.copy()
 
             updated_stats = connect_blobs1(stats_copy, centroids)
-            print('*********************')
-            print('Stats')
-            print(stats)
-            print('---------------------')
-            print('Updated stats')
-            print(updated_stats)
-            print('*********************')
+            # print('*********************')
+            # print('Stats')
+            # print(stats)
+            # print('---------------------')
+            # print('Updated stats')
+            # print(updated_stats)
+            # print('*********************')
 
             for i in range(updated_stats.shape[0]):
                 if updated_stats[i, 4] > MIN_AREA:
@@ -115,7 +115,7 @@ while cap.isOpened():
         combined_imgs = np.hstack([mask_filtered, frame, frame_temp])
         cv2.imshow('Combined', combined_imgs)
 
-        if cv2.waitKey(0) & 0xff == ord('q'):
+        if cv2.waitKey(10) & 0xff == ord('q'):
             break
     else:
         break

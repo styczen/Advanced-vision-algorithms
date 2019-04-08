@@ -6,7 +6,7 @@ import os
 THRESHOLD = 40
 NR_SAMPLES = 39
 PROB_THRESHOLD = 240
-STRIDE = 5
+STRIDE = 1
 
 DIR = os.path.dirname(sys.argv[0])
 
@@ -190,7 +190,7 @@ while cap.isOpened():
                                   pt2=(j + 64, i + 192),
                                   color=(0, 0, 255),
                                   thickness=2)
-                    # ruint8[i, j, :] = [0, 0, 255]
+                    ruint8[i, j, :] = [0, 0, 255]
 
         boxes = np.array(boxes)
         updated_boxes = non_max_suppression_fast(boxes, 0.4)
