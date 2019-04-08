@@ -201,10 +201,10 @@ while cap.isOpened():
                           color=(0, 0, 255),
                           thickness=2)
 
-        combined = np.hstack([frame_all_bbox, frame])
+        combined = np.hstack([ruint8, frame_all_bbox, frame])
         # cv2.imshow('Result', ruint8)
         # cv2.imshow('Frame', frame)
-        cv2.imshow('Left: all bboxes; right: suppressed', combined)
+        cv2.imshow('left: probabilities; middle: all bboxes; right: suppressed', combined)
 
         key = cv2.waitKey(1)
         if key & 0xff == ord('q'):
