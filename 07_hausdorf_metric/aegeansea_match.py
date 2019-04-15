@@ -103,7 +103,7 @@ cv2.namedWindow('aegeansea_img', cv2.WINDOW_NORMAL)
 cv2.resizeWindow('aegeansea_img', 600, 600)
 cv2.imshow('aegeansea_img', aegeansea_img)
 
-cv2.imwrite(DIR + '/result.png', aegeansea_img)
+cv2.imwrite(DIR + '/find_astipalea.png', aegeansea_img)
 cv2.waitKey(0)
 
 cv2.destroyAllWindows()

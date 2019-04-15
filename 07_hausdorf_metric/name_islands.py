@@ -117,13 +117,13 @@ for i, image_file_name in enumerate(images):
     cv2.putText(aegeansea_img, str(island_name), (int(x_c_best), int(y_c_best)),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
 
-    cv2.imwrite(DIR + '/result.png', aegeansea_img)
+    cv2.imwrite(DIR + '/result_multiple_islands.png', aegeansea_img)
 
 cv2.namedWindow('aegeansea_img', cv2.WINDOW_NORMAL)
 cv2.resizeWindow('aegeansea_img', 600, 600)
 cv2.imshow('aegeansea_img', aegeansea_img)
 
-cv2.imwrite(DIR + '/result.png', aegeansea_img)
+# cv2.imwrite(DIR + '/result.png', aegeansea_img)
 cv2.waitKey(0)
 
 cv2.destroyAllWindows()
