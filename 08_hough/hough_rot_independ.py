@@ -4,6 +4,7 @@ import os
 import sys
 
 DIR = os.path.dirname(sys.argv[0])
+DELTA = 30
 
 print('Loading template...')
 trybik = cv2.imread(DIR + '/obrazy_hough/trybik.jpg')
@@ -72,36 +73,55 @@ orientation2 = np.rad2deg(np.arctan2(sobely2, sobelx2))
 orientation2 += 180
 orientation2 = np.uint16(orientation2)
 
-accum = np.zeros(trybik2.shape[:2], dtype=np.uint8)
+# accum = np.zeros(trybik2.shape[:2], dtype=np.uint8)
+
+nr_angles = 10
+new_hough_shape = trybik2.shape[:2] + (nr_angles,)
+new_hough = np.zeros(new_hough_shape)
+angles = [angle for angle in range(0, 360, int(360 / nr_angles))]
 
 print('Finding matches...')
 for row in range(gradient2.shape[0]):
     for col in range(gradient2.shape[1]):
         if gradient2[row, col] > 0.5:
-            table = Rtable[orientation2[row, col]]
-            for t in table:
-                x1 = int(col + t[0]*np.cos(t[1]))
-                y1 = int(row + t[0]*np.sin(t[1]))
-                if 0 <= x1 < gradient2.shape[1] and 0 <= y1 < gradient2.shape[0]:
-                    accum[y1, x1] += 1
+            for i in range(len(angles)):
+                df = angles[i]
+                table = Rtable[orientation2[row, col] - df]
+                for t in table:
+                    x1 = int(col + t[0]*np.cos(t[1] + np.deg2rad(df)))
+                    y1 = int(row + t[0]*np.sin(t[1] + np.deg2rad(df)))
+                    if 0 <= x1 < gradient2.shape[1] and 0 <= y1 < gradient2.shape[0]:
+                        new_hough[y1, x1, i] += 1
 print('...done\n')
 
-print('Drawing found match...')
-idx = np.where(accum == accum.max())
-for i in range(len(idx[0])):
+print('Drawing found matches...')
+for i in range(5):
+    idx = np.argmax(new_hough)
+    idx = np.unravel_index(idx, new_hough_shape)
+    xc = idx[1]
+    yc = idx[0]
+    df = angles[idx[2]]
     cv2.circle(img=trybik2,
-               center=(np.int(idx[1][i]), np.int(idx[0][i])),
+               center=(np.int(xc), np.int(yc)),
                radius=2,
                color=(0, 0, 255),
                thickness=2)
+    cv2.putText(trybik2, str(i), (int(xc), int(yc)),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+    for omega_item in Rtable:
+        for item in omega_item:
+            r = item[0]
+            beta = item[1]
+            x = xc - r*np.cos(beta + np.deg2rad(df))
+            y = yc - r*np.sin(beta + np.deg2rad(df))
+            cv2.circle(img=trybik2,
+                       center=(np.int(x), np.int(y)),
+                       radius=1,
+                       color=(255, 0, 0))
+    new_hough[idx[0]-DELTA:idx[0]+DELTA, idx[1]-DELTA:idx[1]+DELTA, :] = 0
 print('...done\n')
 
-# cv2.imshow('trybik', trybik)
-
-accum = np.uint8(accum * 255.0 / accum.max())
-accum = cv2.cvtColor(accum, cv2.COLOR_BGRA2BGR)
-result = np.hstack([trybik2, accum])
-cv2.imshow('result', result)
+cv2.imshow('trybik2', trybik2)
 
 cv2.waitKey(0)
 
