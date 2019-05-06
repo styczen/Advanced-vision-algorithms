@@ -19,7 +19,7 @@ x_c = m['m10'] / m['m00']
 y_c = m['m01'] / m['m00']
 
 # REMEMBER TO ADD THIRD RETURN PARAM IN FRONT BECAUSE OF DIFFERENT OPENCV VERSIONS
-contours, hierarchy = cv2.findContours(image=trybik_mask,
+_, contours, hierarchy = cv2.findContours(image=trybik_mask,
                                        mode=cv2.RETR_TREE,  # first contour should be the longest
                                        method=cv2.CHAIN_APPROX_NONE)
 
@@ -99,7 +99,7 @@ print('...done\n')
 # cv2.imshow('trybik', trybik)
 
 accum = np.uint8(accum * 255.0 / accum.max())
-accum = cv2.cvtColor(accum, cv2.COLOR_BGRA2BGR)
+accum = cv2.cvtColor(accum, cv2.COLOR_GRAY2BGR)
 result = np.hstack([trybik2, accum])
 cv2.imshow('result', result)
 
