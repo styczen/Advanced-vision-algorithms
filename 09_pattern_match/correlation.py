@@ -26,9 +26,8 @@ ccor_abs = np.abs(ccor)
 plt.figure()
 plt.imshow(ccor_abs, cmap='gray')
 plt.title('abs(ccor)')
-plt.show()
 
-y,x = np.unravel_index(np.argmax(ccor_abs), ccor_abs.shape)
+y, x = np.unravel_index(np.argmax(ccor_abs), ccor_abs.shape)
 
 cv2.circle(img=test_img_color,
            center=(x, y),
@@ -47,9 +46,8 @@ ccor_norm_abs = np.abs(ccor_norm)
 plt.figure()
 plt.imshow(ccor_norm_abs, cmap='gray')
 plt.title('abs(R)')
-plt.show()
 
-y, x = np.unravel_index(np.argmax(ccor_norm_abs ), ccor_norm_abs.shape)
+y, x = np.unravel_index(np.argmax(ccor_norm_abs), ccor_norm_abs.shape)
 
 cv2.circle(img=test_img_color,
            center=(x, y),
@@ -62,7 +60,6 @@ ext_pattern_tr = cv2.warpAffine(ext_pattern, tr_m, (ext_pattern.shape[1], ext_pa
 
 plt.figure()
 plt.imshow(ext_pattern_tr, cmap='gray')
-plt.show()
 
 plt.figure()
 plt.imshow(test_img_color)
