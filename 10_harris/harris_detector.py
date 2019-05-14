@@ -6,7 +6,7 @@ import sys
 import numpy as np
 import scipy.ndimage.filters as filters
 
-DIR = os.path.dirname(sys.argv[0])
+DIR = os.path.abspath('')
 
 IMG_NAME1 = 'fontanna1.jpg'
 IMG_NAME2 = 'fontanna2.jpg'
@@ -49,7 +49,7 @@ def draw_points(img, points):
     plt.figure()
     plt.imshow(img)
     plt.plot(points[1], points[0], '*', color='r')
-    plt.show()
+    # plt.show()
 
 
 # Loading images
@@ -71,3 +71,4 @@ m2 = find_max(h2, KERNEL_SIZE, THRESHOLD)
 
 draw_points(img1_color, m1)
 draw_points(img2_color, m2)
+plt.show()
