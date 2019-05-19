@@ -6,7 +6,8 @@ import sys
 import numpy as np
 import scipy.ndimage.filters as filters
 
-DIR = os.path.abspath('')
+# DIR = os.path.abspath('')
+DIR = os.path.dirname(sys.argv[0])
 
 IMG_NAME1 = 'fontanna1.jpg'
 IMG_NAME2 = 'fontanna2.jpg'

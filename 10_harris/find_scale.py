@@ -9,6 +9,26 @@ import scipy.ndimage.filters as filters
 DIR = os.path.dirname(sys.argv[0])
 IMG_NAME1 = 'fontanna1.jpg'
 IMG_NAME2 = 'fontanna_pow.jpg'
+KERNEL_SIZE = 7
+THRESHOLD = 0.2
+
+
+def h_fun(img, kernel_size=3):
+    """Calculates Harris operator array for every pixel"""
+    Ix = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=kernel_size)
+    Iy = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=kernel_size)
+    Ix_square = Ix * Ix
+    Iy_square = Iy * Iy
+    Ixy = Ix * Iy
+    Ix_square_blur = cv2.GaussianBlur(Ix_square, (kernel_size, kernel_size), 0)
+    Iy_square_blur = cv2.GaussianBlur(Iy_square, (kernel_size, kernel_size), 0)
+    Ixy_blur = cv2.GaussianBlur(Ixy, (kernel_size, kernel_size), 0)
+    det = Ix_square_blur * Iy_square_blur - Ixy_blur * Ixy_blur
+    trace = Ix_square_blur + Iy_square_blur
+    k = 0.05
+    h = det - k*trace*trace
+    h = h / np.max(h)
+    return h
 
 
 def pyramid(image, blur_nbr, k, sigma):
@@ -27,7 +47,6 @@ def pyramid(image, blur_nbr, k, sigma):
     return res_img
 
 
-# TODO: rewrite to find all extremas (max and min)
 def find_max(image, size, threshold):
     """Finds maximum of array"""
     data_max = filters.maximum_filter(image, size)
@@ -37,11 +56,24 @@ def find_max(image, size, threshold):
     return np.nonzero(maxima)
 
 
+def pyramid_find_max(pyramid_imgs, size, threshold):
+    """Finds maximum for every scale in pyramid."""
+    res = []
+    for i in range(pyramid_imgs.shape[0]):
+        res.append(find_max(pyramid_imgs[i, :, :], size, threshold))
+    return res
+
+
 def draw_points(img, points):
     plt.figure()
-    plt.imshow(img)
+    plt.imshow(img, cmap='gray')
     plt.plot(points[1], points[0], '*', color='r')
-    plt.show()
+
+
+def pyramid_draw_points(pyramid_imgs, pts):
+    for i in range(pyramid_imgs.shape[0]):
+        draw_points(pyramid_imgs[i, :, :], pts[i])
+    # plt.show()
 
 
 # Loading images
@@ -55,13 +87,23 @@ img1 = cv2.imread(DIR + '/pliki_harris/' + IMG_NAME1, cv2.IMREAD_GRAYSCALE)
 img2 = cv2.imread(DIR + '/pliki_harris/' + IMG_NAME2, cv2.IMREAD_GRAYSCALE)
 
 p1 = pyramid(img1, 5, 1.26, 1.6)
-e1 = find_max(p1, 7, 0.5)
+e1 = pyramid_find_max(p1, 7, 0.5)
 
 p2 = pyramid(img2, 10, 1.26, 1.6)
-e2 = find_max(p2, 7, 0.5)
+e2 = pyramid_find_max(p2, 7, 0.5)
 
+pyramid_draw_points(p1, e1)
+pyramid_draw_points(p2, e2)
+# plt.show()
+# 10 scales
 
-for i in range(5):
-    plt.figure()
-    plt.imshow(p1[i, :, :], cmap='gray')
+# Use Harris for both two images
+h1 = h_fun(img1, KERNEL_SIZE)
+m1 = find_max(h1, KERNEL_SIZE, THRESHOLD)
+
+h2 = h_fun(img2, KERNEL_SIZE)
+m2 = find_max(h2, KERNEL_SIZE, THRESHOLD)
+
+draw_points(img1, m1)
+draw_points(img2, m2)
 plt.show()
