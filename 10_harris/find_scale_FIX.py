@@ -46,7 +46,7 @@ def pyramid(image, blur_nbr, k, sigma):
 
     return res_img
 
-
+# FIXME: Find max call for whole pyramid, find max in all 3 dimensions
 def find_max(image, size, threshold):
     """Finds maximum of array"""
     data_max = filters.maximum_filter(image, size)
@@ -87,10 +87,10 @@ img1 = cv2.imread(DIR + '/pliki_harris/' + IMG_NAME1, cv2.IMREAD_GRAYSCALE)
 img2 = cv2.imread(DIR + '/pliki_harris/' + IMG_NAME2, cv2.IMREAD_GRAYSCALE)
 
 p1 = pyramid(img1, 5, 1.26, 1.6)
-e1 = pyramid_find_max(p1, 7, 0.5)
+e1 = find_max(p1, 7, 0.5)
 
 p2 = pyramid(img2, 10, 1.26, 1.6)
-e2 = pyramid_find_max(p2, 7, 0.5)
+e2 = find_max(p2, 7, 0.5)
 
 pyramid_draw_points(p1, e1)
 pyramid_draw_points(p2, e2)

@@ -1,10 +1,7 @@
 import cv2
 import numpy as np
 import os
-import matplotlib
 import matplotlib.pyplot as plt
-# import numpy.fft as fft
-from matplotlib.patches import Rectangle
 
 
 def hanning2D(n):
@@ -19,20 +16,14 @@ def highpassFilter(size):
     return (1.0 - X) * (2.0 - X)
 
 
-# def rotate(x, y, xo, yo, theta):  # rotate x,y around xo,yo by theta (deg)
-#     xr = np.cos(np.deg2rad(theta))*(x-xo)-np.sin(np.deg2rad(theta))*(y-yo) + xo
-#     yr = np.sin(np.deg2rad(theta))*(x-xo)+np.cos(np.deg2rad(theta))*(y-yo) + yo
-#     return int(xr), int(yr)
-
-
 plt.close('all')
-DIR = "/home/bartek/learning/Advanced-vision-algorithms/09_pattern_match"
-# DIR = os.getcwd()
+# DIR = "/home/bartek/learning/Advanced-vision-algorithms/09_pattern_match"
+DIR = os.getcwd()
 pattern_img = cv2.imread(DIR + '/obrazy_Mellin/domek_r0_64.pgm',
                          cv2.IMREAD_GRAYSCALE)
 pattern_img_copy = pattern_img.copy()
 
-test_img = cv2.imread(DIR + '/obrazy_Mellin/domek_s80.pgm',
+test_img = cv2.imread(DIR + '/obrazy_Mellin/domek_r30.pgm',
                       cv2.IMREAD_GRAYSCALE)
 pattern_img = pattern_img * hanning2D(pattern_img.shape[0])
 
@@ -92,10 +83,10 @@ else:
 A = (wsp_kata * 360.0)/rozmiar_kata
 # gdzie M to parametr funkcji cv2.logPolar, a wykl wyliczamy jako:
 scale = np.exp(wykl / M)
-kat1 = - A  # gdzie A = (wsp_kata * 360.0 ) /rozmiar_kata
+kat1 = -A  # gdzie A = (wsp_kata * 360.0 ) /rozmiar_kata
 kat2 = 180 - A
 
-srodekTrans = ((pattern.shape[0] / 2), (pattern.shape[1] / 2))
+srodekTrans = ((pattern_c.shape[0] / 2), (pattern_c.shape[1] / 2))
 macierz_translacji_1 = cv2.getRotationMatrix2D((srodekTrans[0],
                                                 srodekTrans[1]), kat1, scale)
 macierz_translacji_2 = cv2.getRotationMatrix2D((srodekTrans[0],
@@ -143,7 +134,7 @@ else:
     macierz_translacji_best = macierz_translacji_2
 
 M = cv2.getRotationMatrix2D((test_img.shape[0]//2,
-                             test_img.shape[1]//2), -kat_best, 1)
+                             test_img.shape[1]//2), -kat1, 1)
 test_img = cv2.warpAffine(test_img, M,
                           test_img.shape)
 
@@ -154,10 +145,15 @@ if abs(kat_best) < 1:
                               test_img.shape)
 
 plt.figure()
-plt.imshow(pattern_img_copy, cmap='gray')
+# plt.imshow(pattern_img_copy, cmap='gray')
+plt.imshow(im_rot_scaled_1, cmap='gray')
 
 plt.figure()
 plt.imshow(test_img, 'gray')
+
+plt.figure()
+# plt.imshow(np.abs(ccor_norm_1))
+plt.imshow(np.abs(ccor_norm_1))
 
 # print('x = {}\ny = {}\nangle = {}'.format(x_best, y_best, kat_best))
 
