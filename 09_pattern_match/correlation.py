@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import cv2
 import numpy as np
 import os
@@ -8,7 +9,8 @@ DIR = os.path.dirname(sys.argv[0])
 
 print('Loading images...')
 pattern = cv2.imread(DIR + '/obrazy_Mellin/wzor.pgm', cv2.IMREAD_GRAYSCALE)
-test_img = cv2.imread(DIR + '/obrazy_Mellin/domek_r0.pgm', cv2.IMREAD_GRAYSCALE)
+test_img = cv2.imread(DIR + '/obrazy_Mellin/domek_r0.pgm',
+                      cv2.IMREAD_GRAYSCALE)
 test_img_color = cv2.imread(DIR + '/obrazy_Mellin/domek_r0.pgm')
 print('...done')
 
@@ -56,7 +58,8 @@ cv2.circle(img=test_img_color,
            thickness=3)
 
 tr_m = np.float32([[1, 0, x], [0, 1, y]])
-ext_pattern_tr = cv2.warpAffine(ext_pattern, tr_m, (ext_pattern.shape[1], ext_pattern.shape[0]))
+ext_pattern_tr = cv2.warpAffine(
+    ext_pattern, tr_m, (ext_pattern.shape[1], ext_pattern.shape[0]))
 
 plt.figure()
 plt.imshow(ext_pattern_tr, cmap='gray')
