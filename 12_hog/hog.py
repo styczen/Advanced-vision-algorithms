@@ -1,9 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import sys
+import scipy.misc
 import scipy.ndimage.filters
 import math
 
@@ -71,8 +72,8 @@ def histogram(SXY, DIR, XX, YY):
     for jj in range(0, YY_cell):
         for ii in range(0, XX_cell):
             # Wyciecie komorki
-            M = SXY[jj*cellSize:(jj+1)*cellSize,ii*cellSize:(ii+1)*cellSize]
-            T = DIR[jj*cellSize:(jj+1)*cellSize,ii*cellSize:(ii+1)*cellSize]
+            M = SXY[jj*cellSize:(jj+1)*cellSize, ii*cellSize:(ii+1)*cellSize]
+            T = DIR[jj*cellSize:(jj+1)*cellSize, ii*cellSize:(ii+1)*cellSize]
             M = M.flatten()
             T = T.flatten()
 
@@ -85,7 +86,7 @@ def histogram(SXY, DIR, XX, YY):
                 if t < 0:
                     t = t + 180
 
-                # Wyliczenie przezdialu
+                # Wyliczenie przedzialu
                 t0 = np.floor((t - 10) / 20) * 20 + 10  # Przedzial ma rozmiar 20, srodek to 20
 
                 # Przypadek szczegolny tj. t0 ujemny
@@ -107,6 +108,7 @@ def histogram(SXY, DIR, XX, YY):
                 # Aktualizacja histogramu
                 hist[jj, ii, i0] = hist[jj, ii, i0] + m*(1-d)
                 hist[jj, ii, i1] = hist[jj, ii, i1] + m*(d)
+    return hist
 
 
 def hist_normalize(hist, XX, YY):
@@ -128,19 +130,51 @@ def hist_normalize(hist, XX, YY):
             n = np.linalg.norm(H)
             Hn = H/np.sqrt(math.pow(n,2)+e)
             F = np.concatenate((F,Hn))
+    return F
+
+
+def HOGpicture(w, bs=8): # w - histogramy gradientow obrazu, bs - rozmiar komorki (u nas 8)
+    bim1 = np.zeros((bs, bs))
+    bim1[np.round(bs//2):np.round(bs//2)+1, :] = 1
+    bim = np.zeros(bim1.shape+(9,))
+    bim[:, :, 0] = bim1
+    for i in range(0, 9):  # 2:9
+        bim[:, :, i] = scipy.misc.imrotate(bim1, -i*20,'nearest')/255
+    Y, X, Z = w.shape
+    w[w < 0] = 0
+    im = np.zeros((bs*Y, bs*X))
+    for i in range(Y):
+        iisl = (i)*bs
+        iisu = (i+1)*bs
+        for j in range(X):
+            jjsl = j*bs
+            jjsu = (j+1)*bs
+            for k in range(9):
+                im[iisl:iisu, jjsl:jjsu] += bim[:,:,k]*w[i,j,k]
+    return im
 
 
 im = cv2.imread(DIR + '/pedestrians/' + 'pos/' + 'per00060.ppm')
 im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
 
-grad, orie = gradient(im)
+gradient, orientation = gradient(im)
 
-hist = histogram(grad, orie, im.shape[1], im.shape[0])
+hist = histogram(gradient, orientation, im.shape[1], im.shape[0])
+
+hist_norm = hist_normalize(hist, im.shape[1], im.shape[0])
+
+temp = HOGpicture(hist)
 
 plt.figure()
-plt.imshow(grad, cmap='gray')
-# plt.show()
+plt.imshow(gradient, cmap='gray')
+plt.title('Gradient')
 
 plt.figure()
-plt.imshow(orie, cmap='gray')
+plt.imshow(temp, cmap='gray')
+plt.title('Histograms')
+
+plt.figure()
+plt.imshow(orientation, cmap='gray')
+plt.title('Orientation')
+
 plt.show()
