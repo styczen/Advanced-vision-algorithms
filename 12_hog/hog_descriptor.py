@@ -32,10 +32,13 @@ def grad(img):
     gradG = np.sqrt(gradGx ** 2 + gradGy ** 2)
     gradB = np.sqrt(gradBx ** 2 + gradBy ** 2)
 
-    grad1 = gradB.copy()        # poczatkowo wynikowa macierz to gradient skladowej B
+    grad1 = gradB.copy() # poczatkowo wynikowa macierz to gradient skladowej B
+    
     # m1 - tablica pomocnicza do wyznaczania maksimum miedzy skladowymi B i G
     m1 = gradB - gradG
-    # w macierzy wynikowej gradienty skladowej B sa podmieniane na wieksze od nich gradienty skladowej G
+    
+    # w macierzy wynikowej gradienty skladowej B sa podmieniane na wieksze 
+    # od nich gradienty skladowej G
     grad1[m1 < 0] = gradG[m1 < 0]
 
     grad2 = gradR.copy()
@@ -53,6 +56,7 @@ def grad(img):
     orie2 = orientationR.copy()
     orie2[m2 < 0] = orie1[m2 < 0]
 
+    # Black border of image
     grad2[0,  0:-1] = 0
     grad2[-1, 0:-1] = 0
     grad2[0:-1, 0] = 0
@@ -110,8 +114,6 @@ def hist(SXY, DIR, XX, YY):
 
                 # Obliczenie odleglosci do srodka przedzialu
                 d = min(abs(t-t0), 180 - abs(t-t0)) / 20
-
-                # print('i0 = {}, i1 = {}'.format(i0, i1))
 
                 # Aktualizacja histogramu
                 hist[jj, ii, i0] = hist[jj, ii, i0] + m*(1-d)
